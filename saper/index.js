@@ -1,5 +1,4 @@
-
-//starter elements
+//starter elements - basic input fields
 let el;
 let label;
 let submit = document.createElement("input");
@@ -7,7 +6,7 @@ let inputFields = ["height", "width", "mines"];
 let div = document.createElement("div");
 div.setAttribute("style", "display: flex; flex-wrap: wrap; width: 120px");
 
-//display input fields
+//display input fields - height, width, mines
 inputFields.forEach(field => {
     el = document.createElement("input");
     label = document.createElement("label");
@@ -16,13 +15,13 @@ inputFields.forEach(field => {
     label.innerText = field.charAt(0).toUpperCase() + field.slice(1) + ": ";
     div.append(label, el);
 })
-
+//display submit button
 submit.type = "submit";
 submit.value = "Generate";
 submit.id = "submit";
 div.append(submit);
 
-//add on click generate
+//add invisible info about remaining mines and time
 let div2 = document.createElement("div");
 div2.setAttribute("style", "display: flex; flex-direction: column; align-items: center; justify-content: center; width");
 let remaining = document.createElement("div");
@@ -34,9 +33,10 @@ timer.style.display = "none";
 
 div2.append(remaining, timer);
 
-//add to DOM
+//append everything to DOM
 document.body.append(div, div2);
 
+//get elements from DOM
 height = document.getElementById("height");
 width = document.getElementById("width");
 mines = document.getElementById("mines");
@@ -44,7 +44,9 @@ submit = document.getElementById("submit");
 remaining = document.getElementById("remaining");
 timer = document.getElementById("timer");
 
-//generate onclick
+//submit on click
+//check if input is valid
+//show invisible information and board, start timer
 submit.addEventListener("click", function () {
     if (height.value == '' || width.value == '' || mines.value == '') {
         alert("Fill all fields!");
@@ -57,7 +59,7 @@ submit.addEventListener("click", function () {
     }
 });
 
-//time
+//time counter
 function countTime() {
     let time = 0;
     setInterval(function () {
@@ -66,7 +68,7 @@ function countTime() {
     }, 1000);
 }
 
-//generate board
+//board field object that describes it and its properties
 const BOARD = [[], []];
 const FIELD = {
     isRevealed: false,
@@ -76,16 +78,22 @@ const FIELD = {
     number: 0
 }
 
+//generate board function - start
 function generateBoard() {
     let row;
     let cell;
     let board = document.createElement("table");
     board.setAttribute("style", "border-collapse: collapse;");
 
+    //create board
+    //add objects to board array
+    //add event listeners to fields
+    //create table
     for (let h = 0; h < height.value; h++) {
         row = document.createElement("tr");
         for (let w = 0; w < width.value; w++) {
             BOARD.push(FIELD);
+            BOARD[h][w].addEventListener("click", clickAction);
             cell = document.createElement("td");
             cell.setAttribute("style", "border: 1px solid white; width: 20px; height: 20px; background-color: grey;");
             row.append(cell);
