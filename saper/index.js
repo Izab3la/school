@@ -5,7 +5,7 @@ let label;
 let submit = document.createElement("input");
 let fields = ["height", "width", "mines"];
 let div = document.createElement("div");
-div.setAttribute("style", "display: flex; flex-wrap: wrap; width: 180px");
+div.setAttribute("style", "display: flex; flex-wrap: wrap; width: 120px");
 
 //display input fields
 fields.forEach(field => {
@@ -23,6 +23,8 @@ submit.id = "submit";
 div.append(submit);
 
 //add on click generate
+let div2 = document.createElement("div");
+div2.setAttribute("style", "display: flex; flex-direction: column; align-items: center; justify-content: center; width");
 let remaining = document.createElement("div");
 let timer = document.createElement("div");
 remaining.id = "remaining";
@@ -30,10 +32,10 @@ timer.id = "timer";
 remaining.style.display = "none";
 timer.style.display = "none";
 
-div.append(remaining, timer);
+div2.append(remaining, timer);
 
 //add to DOM
-document.body.append(div);
+document.body.append(div, div2);
 
 height = document.getElementById("height");
 width = document.getElementById("width");
