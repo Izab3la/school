@@ -3,12 +3,12 @@
 let el;
 let label;
 let submit = document.createElement("input");
-let fields = ["height", "width", "mines"];
+let inputFields = ["height", "width", "mines"];
 let div = document.createElement("div");
 div.setAttribute("style", "display: flex; flex-wrap: wrap; width: 120px");
 
 //display input fields
-fields.forEach(field => {
+inputFields.forEach(field => {
     el = document.createElement("input");
     label = document.createElement("label");
     el.id = field;
@@ -49,15 +49,16 @@ submit.addEventListener("click", function () {
     if (height.value == '' || width.value == '' || mines.value == '') {
         alert("Fill all fields!");
     } else {
-        timer.innerText = startTimer();
+        timer.innerText = countTime();
         remaining.innerText = "Remaining mines: " + mines.value;
         remaining.style.display = "block";
         timer.style.display = "block";
+        generateBoard();
     }
 });
 
 //time
-function startTimer() {
+function countTime() {
     let time = 0;
     setInterval(function () {
         time++;
@@ -66,12 +67,32 @@ function startTimer() {
 }
 
 //generate board
-const BOARD = [];
+const BOARD = [[], []];
+const FIELD = {
+    isRevealed: false,
+    isThereQuestionMark: false,
+    isThereFlag: false,
+    isThereMine: false,
+    number: 0
+}
 
 function generateBoard() {
+    let row;
+    let cell;
+    let board = document.createElement("table");
+    board.setAttribute("style", "border-collapse: collapse;");
+
     for (let h = 0; h < height.value; h++) {
+        row = document.createElement("tr");
         for (let w = 0; w < width.value; w++) {
+            BOARD.push(FIELD);
+            cell = document.createElement("td");
+            cell.setAttribute("style", "border: 1px solid white; width: 20px; height: 20px; background-color: grey;");
+            row.append(cell);
         }
+        board.append(row);
     }
+
+    document.body.append(board);
 
 }
