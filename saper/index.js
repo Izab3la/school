@@ -1,32 +1,62 @@
 //basic info
-const WIDTH = 16;
-const HEIGHT = 16;
-const BOARD = [];
+const WIDTH = 40;
+const HEIGHT = 40;
+let time = 0;
+let remainingMines;
+
+const GameStatus = {
+    INIT: 0,
+    PLAYING: 1,
+    FINISHED: 2
+}
+let gameStatus = GameStatus.INIT;
+//board field object that describes it and its properties
+const FIELD = {
+    isRevealed: false,
+    isThereQuestionMark: false,
+    isThereFlag: false,
+    isThereMine: false,
+    isMineDetonated: false,
+    minesAround: 0
+}
+
+const timer = document.createElement("div");
+const remaining = document.createElement("div");
+const userUI = document.createElement("div");
+const table = document.createElement("table");
+
+init()
+const height = document.getElementById("height");
+const width = document.getElementById("width");
+const mines = document.getElementById("mines");
+const boardDimensions = {
+    x: parseInt(width.value),
+    y: parseInt(height.value)
+}
 
 //image url - image that is displayed on field
-const IMG = {
-    blank: "./img/klepa.PNG",
-    flag: "./img/flaga.PNG",
-    questionMark: "./img/pyt.png",
-    mine: "./img/pbomb.PNG",
-    detonatedMine: "./img/bomb.PNG",
+const Img = {
+    BLANK: "./img/klepa.PNG",
+    FLAG: "./img/flaga.PNG",
+    QUESTION_MARK: "./img/pyt.png",
+    MINE: "./img/pbomb.PNG",
+    DETONATED_MINE: "./img/bomb.PNG",
 }
 
 //starter elements - basic input fields
-function start() {
-    let el;
-    let label;
-    let submit = document.createElement("input");
-    let inputFields = ["height", "width", "mines"];
-    let div = document.createElement("div");
+function init() {
+    const submit = document.createElement("input");
+    const inputFields = ["height", "width", "mines"];
+    const div = document.createElement("div");
     div.setAttribute("style", "display: flex; flex-wrap: wrap; width: 120px");
 
     //display input fields - height, width, mines
     inputFields.forEach(field => {
-        el = document.createElement("input");
-        label = document.createElement("label");
+        const el = document.createElement("input");
+        const label = document.createElement("label");
         el.id = field;
         el.type = "number";
+        // el.value = 5;
         label.innerText = field.charAt(0).toUpperCase() + field.slice(1) + ": ";
         div.append(label, el);
     })
@@ -37,204 +67,183 @@ function start() {
     div.append(submit);
 
     //add invisible info about remaining mines and time
-    let div2 = document.createElement("div");
-    div2.setAttribute("style", "display: flex; flex-direction: column; align-items: center; justify-content: center; width");
-    let remaining = document.createElement("div");
-    let timer = document.createElement("div");
-    remaining.id = "remaining";
-    timer.id = "timer";
-    remaining.style.display = "none";
-    timer.style.display = "none";
+    userUI.setAttribute("style", "display: flex; flex-direction: column; align-items: center; justify-content: center; ");
+    userUI.style.display = "none";
+    userUI.append(remaining, timer);
+    table.setAttribute("style", "border-collapse: collapse; border: solid lightgray 1px;");
+    userUI.append(table);
 
-    div2.append(remaining, timer);
-
-    //append everything to DOM
-    document.body.append(div, div2);
-
-    displayOnSubmit();
-}
-
-//display elements on submit
-function displayOnSubmit() {
-    //get elements from DOM
-    let height = document.getElementById("height");
-    let width = document.getElementById("width");
-    mines = document.getElementById("mines");
-    submit = document.getElementById("submit");
-    remaining = document.getElementById("remaining");
-    timer = document.getElementById("timer");
+    //append everything to DOM and atart timing function
+    document.body.append(div, userUI);
+    countTime();
 
     //submit on click
     submit.addEventListener("click", function () {
+        boardDimensions.x = parseInt(width.value);
+        boardDimensions.y = parseInt(height.value);
         //check if input is valid
         if (height.value == '' || width.value == '' || mines.value == '') {
             alert("Fill all fields!");
         } else {
-            //show invisible information and board, start timer
-            timer.innerText = countTime();
-            remaining.innerText = "Remaining mines: " + mines.value;
-            remaining.style.display = "block";
-            timer.style.display = "block";
-            generateBoard();
+            restart()
         }
     });
+}
 
+function restart() {
+    gameStatus = GameStatus.INIT;
+    time = 0;
+    remainingMines = mines.value
+    //show invisible information and board, start timer
+    remaining.innerText = "Remaining mines: " + remainingMines;
+    userUI.style.display = "block";
+
+    //generate board
+    const board = JSON.parse(JSON.stringify(Array(boardDimensions.y).fill() // create array of y elements filled with undefined
+        .map(() => Array(boardDimensions.x).fill(FIELD)))); // map each elment of 1d array to an array of x elements filled with FIELD
+
+    drawBoard(table, board);
 }
 
 //time counter - start
 function countTime() {
-    let time = 0;
+    timer.innerText = "Your play time: " + time + "s";
     setInterval(function () {
-        time++;
-        timer.innerText = "Your play time: " + time + "s";
+        if (gameStatus == GameStatus.PLAYING) {
+            time++;
+            timer.innerText = "Your play time: " + time + "s";
+        }
     }, 1000);
 }
 
-//generate board function - start
-function generateBoard() {
-    let row;
-    let cell;
-    let table = document.createElement("table");
-    table.setAttribute("style", "border-collapse: collapse; border: solid lightgray 1px;");
+function drawBoard(table, board) {
+    table.innerHTML = "";
 
-    //create board
-    //add objects to board array
-    //add starter event listener
-    //create table
-    for (let h = 0; h < height.value; h++) {
-        row = document.createElement("tr");
-        BOARD[h] = [];
-        for (let w = 0; w < width.value; w++) {
-            //board field object that describes it and its properties
-            const FIELD = {
-                isRevealed: false,
-                isThereQuestionMark: false,
-                isThereFlag: false,
-                isThereMine: false,
-                html: '<td></td>',
-                id: `num ${h} ${w}`
+    board.forEach((row, y) => {
+        const tr = document.createElement("tr");
+        row.forEach((field, x) => {
+            const td = document.createElement("td");
+            td.setAttribute("style", `border: 1px solid white; width: ${WIDTH}px; height: ${HEIGHT}px; background-repeat: no-repeat; background-size: cover;`);
+            //displaying correct image for the field state
+            if (field.isThereFlag) {
+                td.style.backgroundImage = `url(${Img.FLAG})`;
+            } else if (field.isThereQuestionMark) {
+                td.style.backgroundImage = `url(${Img.QUESTION_MARK})`;
+            } else if (field.isMineDetonated) {
+                td.style.backgroundImage = `url(${Img.DETONATED_MINE})`;
+            } else if (!field.isRevealed) {
+                td.style.backgroundImage = `url(${Img.BLANK})`;
+            } else if (field.isThereMine) {
+                td.style.backgroundImage = `url(${Img.MINE})`;
+            } else if (field.minesAround > 0) {
+                td.innerText = field.minesAround;
+                td.style.backgroundColor = 'lightgray';
+                td.style.color = ['red', 'green', 'blue', 'purple', 'orange', 'pink', 'black', 'brown'][field.minesAround - 1];
+                td.style.textAlign = 'center';
+            } else {
+                td.style.backgroundColor = 'lightgray';
             }
-            //adding new cells
-            BOARD[h].push(FIELD);
-            cell = document.createElement("td");
-            cell.innerHTML = BOARD[h][w].html
-            cell.setAttribute("style", `border: 1px solid white; width: ${WIDTH}px; height: ${HEIGHT}px; background-image: url('${IMG.blank}');`);
-            cell.id = `num ${h} ${w}`;
-            cell.addEventListener("click", startGame);
-            row.append(cell);
-        }
-        table.append(row);
-    }
 
-    document.body.append(table);
+            td.addEventListener("click", () => onCellClick(board, field, x, y));
+            td.addEventListener("contextmenu", (event) => {
+                event.preventDefault();
+                onRightClick(board, field)
+            });
+            tr.append(td);
+        });
+        table.append(tr);
+    })
 }
 
-//start game on first click
-function startGame(field) {
-    //get starter board placement
-    addMines();
-    getNumber(field);
+function onCellClick(board, field, x, y) {
+    if (gameStatus === GameStatus.INIT) {
+        gameStatus = GameStatus.PLAYING;
+        addMines(board, boardDimensions.x, boardDimensions.y, parseInt(mines.value), field)
+    }
 
-    //add event listeners to all fields
-    for (let h = 0; h < height.value; h++) {
-        let row = document.getElementsByTagName("tr")[h];
-        for (let w = 0; w < width.value; w++) {
-            let cell = row.getElementsByTagName("td")[w];
-            //remove start game clicker
-            cell.removeEventListener("click", startGame);
-            //add new listeners - rigth and left click
-            cell.addEventListener("click", leftClick);
-            cell.addEventListener("contextmenu", rightClick);
+    if (gameStatus === GameStatus.PLAYING) {
+        if (field.isThereMine) {
+            field.isMineDetonated = true;
+            board.forEach(row => row.forEach(field => {
+                field.isRevealed = true;
+                field.isThereFlag = false;
+                field.isThereQuestionMark = false
+            }));
+            drawBoard(table, board);
+            setTimeout(() => {
+                alert("You lost!");
+            }, 100);
+            console.log(board);
+            gameStatus = GameStatus.FINISHED;
+        } else {
+            revealField(board, field, x, y);
+            drawBoard(table, board);
         }
+    }
+}
+
+//on right click - add question mark, flag, remove both
+function onRightClick(board, field) {
+    if ((gameStatus === GameStatus.PLAYING || gameStatus === GameStatus.INIT) && !field.isRevealed) {
+        if (field.isThereFlag) {
+            //changing flag to question mark and the number of remaining mines
+            remainingMines++;
+            remaining.innerText = "Remaining mines: " + remainingMines;
+            field.isThereFlag = false;
+            field.isThereQuestionMark = true;
+        } else if (field.isThereQuestionMark) {
+            //changing question mark to blank
+            field.isThereQuestionMark = false;
+        } else {
+            // changing blank to flag and the number of remaining mines
+            field.isThereFlag = true;
+            remainingMines--;
+            remaining.innerText = "Remaining mines: " + remainingMines;
+        }
+        drawBoard(table, board);
     }
 }
 
 //add mines to board
-function addMines() {
-    let minesLeft = mines.value;
-
+function addMines(board, x, y, minesLeft, field) {
     //get random mine placement
     while (minesLeft > 0) {
-        let h = Math.floor(Math.random() * height.value);
-        let w = Math.floor(Math.random() * width.value);
+        const h = Math.floor(Math.random() * y);
+        const w = Math.floor(Math.random() * x);
         //check if there is already a mine
         //check if it is the cell clicked
-        if (BOARD[h][w].isThereMine == false) {
+        if (board[h][w].isThereMine === false && board[h][w] !== field) {
             //add mine
             //update the number of mines left to place
-            BOARD[h][w].isThereMine = true;
+            board[h][w].isThereMine = true;
             minesLeft--;
+
+            for (let height = h - 1; height <= h + 1; height++) {
+                for (let width = w - 1; width <= w + 1; width++) {
+                    if (height >= 0 && height < y && width >= 0 && width < x) {
+                        board[height][width].minesAround++;
+                    }
+                }
+            }
         }
+
     }
 }
 
 //reveal clicked cell and surrounding if 0
-function getNumber(field) {
-    let num;
-    //coordinates of the td in relation to the object
-    let place;
-    let target = field.target;
-
-    for (let h = 0; h < BOARD.length; h++) {
-        for (let w = 0; w < BOARD[h].length; w++) {
-            if (BOARD[h][w].id == target.id) {
-                place = { h: h, w: w }
+function revealField(board, field, x, y) {
+    if (!field.isRevealed) {
+        field.isRevealed = true;
+        if (field.minesAround === 0) {
+            for (let height = y - 1; height <= y + 1; height++) {
+                for (let width = x - 1; width <= x + 1; width++) {
+                    if (height >= 0 && height < boardDimensions.y && width >= 0 && width < boardDimensions.x) {
+                        if (!board[height][width].isRevealed) {
+                            revealField(board, board[height][width], width, height);
+                        }
+                    }
+                }
             }
         }
     }
-    console.log(target, BOARD, place);
-
-    //count surrounding mines
-    let minesAround
-    //check mines on top
-    let possibleMines = []
-    //NEED TO ADD CHECKING IF THE ARRAY INDEX EXISTS AND ONLY PUSHING IT IF IT DOES !!!!!!!!!!!!!!
-    possibleMines.push(BOARD[place.h - 1][place.w - 1])
-    possibleMines.push(BOARD[place.h - 1][place.w])
-    possibleMines.push(BOARD[place.h - 1][place.w + 1])
-
-    //check mines on sides
-    possibleMines.push(BOARD[place.h][place.w - 1])
-    possibleMines.push(BOARD[place.h][place.w + 1])
-
-    //check mines on bottom
-    possibleMines.push(BOARD[place.h + 1][place.w - 1])
-    possibleMines.push(BOARD[place.h + 1][place.w])
-    possibleMines.push(BOARD[place.h + 1][place.w + 1])
-
-    possibleMines.filter(obj => {
-        if (obj != undefined) {
-
-        } else if (obj.isThereMine == true) {
-            minesAround++
-        }
-    })
-
-    console.log(possibleMines, minesAround);
-
-    //displaying uncovered fields
-    target.style.removeProperty('background-image')
-    target.style.backgroundColor = 'lightgray'
-    target.innerText = num
 }
-
-//actions on left clicks - reveal field
-function leftClick(field) {
-    let cell = this;
-    console.log('left');
-    getNumber(field);
-
-    //disable click on revealed
-    cell.removeEventListener("click", leftClick);
-}
-
-//actions on right clicks - flags/question marks
-function rightClick(field) {
-    let cell = this;
-    console.log('right');
-
-    //disable displaying context menu
-    field.preventDefault();
-}
-
-start();
