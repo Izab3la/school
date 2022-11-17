@@ -3,6 +3,8 @@ const WIDTH = 40;
 const HEIGHT = 40;
 let time = 0;
 let remainingMines;
+//score storing structure
+let topScores = [];
 
 const GameStatus = {
     INIT: 0,
@@ -24,6 +26,7 @@ const timer = document.createElement("div");
 const remaining = document.createElement("div");
 const userUI = document.createElement("div");
 const table = document.createElement("table");
+const scoreTable = document.createElement("div");
 
 init()
 const height = document.getElementById("height");
@@ -81,7 +84,6 @@ function init() {
     inputFields.forEach(field => {
         const el = document.getElementById(field);
         el.oninput = () => {
-            console.log(el.value);
             if (isNaN(el.value)) {
                 setTimeout(() => {
                     el.value = '';
@@ -277,6 +279,61 @@ function checkWin(board) {
         gameStatus = GameStatus.FINISHED;
         setTimeout(() => {
             alert("You won!");
+            displayTopScores();
         }, 100);
     }
+}
+
+//display top scores from cookies
+function displayTopScores() {
+    //getting current game info
+    const currentGameMode = height.value + "x" + width.value + "x" + mines.value;
+    const currentGameTime = time;
+    const nick = prompt("Enter your nickname:");
+    const mode = {
+        "mode": currentGameMode,
+        "scores": []
+    }
+    const score = {
+        "nick": nick,
+        "time": time
+    }
+
+    //check if nick is empty
+    if (nick === null) {
+        displayTopScores();
+    } else {
+
+        //check if mode already exists in object
+        //add new mode if it doesn't
+        const found = topScores.some(mode => mode.mode === currentGameMode);
+        if (!found) {
+            topScores.push(mode);
+            topScores[topScores.length - 1].scores.push(score);
+        } else {
+            //if it exists - check where to add the score
+            topScores.forEach(mode => {
+                if (mode.mode === currentGameMode) {
+                    for (let i = mode.scores.length - 1; i >= 0; i--) {
+                        if (currentGameTime >= mode.scores[i].time) {
+                            mode.scores.splice(i + 1, 0, score);
+                            break;
+                        } else if (i === 0) {
+                            mode.scores.unshift(score);
+                        }
+                    }
+
+                    //removing last score if there are more than 10
+                    if (mode.scores.length > 10) {
+                        mode.scores.pop();
+                    }
+                }
+            });
+        }
+    }
+
+    //adding scores to cookies that expire in 1 year
+    const date = new Date();
+    date.setFullYear(date.getFullYear() + 1);
+    document.cookie = "topScores=" + JSON.stringify(topScores) + "; expires=" + date.toUTCString();
 }
