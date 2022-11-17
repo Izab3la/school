@@ -55,7 +55,14 @@ function init() {
         const el = document.createElement("input");
         const label = document.createElement("label");
         el.id = field;
-        el.type = "number";
+        el.type = "text";
+        // el.oninput(() => {
+        //     if (!isNaN(el.value) && el.value > 0) {
+        //         setTimeout(() => {
+        //             el.value = '';
+        //         }, 1000)
+        //     }
+        // })
         // el.value = 5;
         label.innerText = field.charAt(0).toUpperCase() + field.slice(1) + ": ";
         div.append(label, el);
@@ -76,6 +83,17 @@ function init() {
     //append everything to DOM and atart timing function
     document.body.append(div, userUI);
     countTime();
+
+    inputFields.forEach(field => {
+        const el = document.getElementById(field);
+        el.addEventListener('input', () => {
+            if (isNaN(el.value) && el.value > 0) {
+                setTimeout(() => {
+                    el.value = '';
+                }, 1000)
+            }
+        })
+    })
 
     //submit on click
     submit.addEventListener("click", function () {
@@ -153,8 +171,10 @@ function drawBoard(table, board) {
         });
         table.append(tr);
     })
+    console.log(board);
 }
 
+//on left click - reveal fields
 function onCellClick(board, field, x, y) {
     if (gameStatus === GameStatus.INIT) {
         gameStatus = GameStatus.PLAYING;
@@ -179,6 +199,10 @@ function onCellClick(board, field, x, y) {
             revealField(board, field, x, y);
             drawBoard(table, board);
         }
+
+        setTimeout(() => {
+            checkWin(board);
+        }, 100);
     }
 }
 
@@ -201,6 +225,10 @@ function onRightClick(board, field) {
             remaining.innerText = "Remaining mines: " + remainingMines;
         }
         drawBoard(table, board);
+
+        setTimeout(() => {
+            checkWin(board);
+        }, 100);
     }
 }
 
@@ -245,5 +273,15 @@ function revealField(board, field, x, y) {
                 }
             }
         }
+    }
+}
+
+//check if the game is won
+function checkWin(board) {
+    if (board.every(row => row.every(field => (field.isThereMine && field.isThereFlag) || (field.isRevealed && !field.isThereMine)))) {
+        gameStatus = GameStatus.FINISHED;
+        setTimeout(() => {
+            alert("You won!");
+        }, 100);
     }
 }
