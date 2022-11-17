@@ -56,17 +56,10 @@ function init() {
         const label = document.createElement("label");
         el.id = field;
         el.type = "text";
-        // el.oninput(() => {
-        //     if (!isNaN(el.value) && el.value > 0) {
-        //         setTimeout(() => {
-        //             el.value = '';
-        //         }, 1000)
-        //     }
-        // })
-        // el.value = 5;
         label.innerText = field.charAt(0).toUpperCase() + field.slice(1) + ": ";
         div.append(label, el);
     })
+
     //display submit button
     submit.type = "submit";
     submit.value = "Generate";
@@ -80,19 +73,22 @@ function init() {
     table.setAttribute("style", "border-collapse: collapse; border: solid lightgray 1px;");
     userUI.append(table);
 
-    //append everything to DOM and atart timing function
+    //append everything to DOM and start timing function
     document.body.append(div, userUI);
     countTime();
 
+    //delete input that is not numeric
     inputFields.forEach(field => {
         const el = document.getElementById(field);
-        el.addEventListener('input', () => {
-            if (isNaN(el.value) && el.value > 0) {
+        el.oninput = () => {
+            console.log(el.value);
+            if (isNaN(el.value)) {
                 setTimeout(() => {
                     el.value = '';
                 }, 1000)
             }
-        })
+
+        }
     })
 
     //submit on click
@@ -171,7 +167,6 @@ function drawBoard(table, board) {
         });
         table.append(tr);
     })
-    console.log(board);
 }
 
 //on left click - reveal fields
