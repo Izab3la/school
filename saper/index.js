@@ -27,7 +27,6 @@ const timer = document.createElement("div");
 const remaining = document.createElement("div");
 const userUI = document.createElement("div");
 const table = document.createElement("table");
-const scoreTable = document.createElement("div");
 
 init()
 const height = document.getElementById("height");
@@ -115,19 +114,7 @@ function restart() {
     remaining.innerText = "Remaining mines: " + remainingMines;
     userUI.style.display = "block";
 
-    const scoreBoard = document.createElement("div");
-    scoreBoard.setAttribute("style", "width: 300px; height: 400px; overflow: auto; border: solid lightgray 1px; position: absolute; right: 0; top: 0; background-color: lightgray; text-align: center;");
-    const scoreTable = topScores.find(score => score.mode === boardDimensions.x + "x" + boardDimensions.y + "x" + mines.value);
-    scoreBoard.innerText = `TOP SCORES
-    for mode ${scoreTable.mode}`;
-    scoreTable.scores.forEach(score => {
-        const scoreDiv = document.createElement("div");
-        scoreDiv.innerText = score.nick + " - " + score.time + "s";
-        scoreBoard.append(scoreDiv);
-    })
-
-    console.log(scoreTable);
-    document.body.append(scoreBoard);
+    displayScores();
 
     //generate board
     const board = JSON.parse(JSON.stringify(Array(boardDimensions.y).fill() // create array of y elements filled with undefined
@@ -294,13 +281,13 @@ function checkWin(board) {
         gameStatus = GameStatus.FINISHED;
         setTimeout(() => {
             alert("You won!");
-            displayTopScores();
+            topScoresTable();
         }, 100);
     }
 }
 
 //display top scores from cookies
-function displayTopScores() {
+function topScoresTable() {
     //getting current game info
     const currentGameMode = height.value + "x" + width.value + "x" + mines.value;
     const currentGameTime = time;
@@ -316,7 +303,7 @@ function displayTopScores() {
 
     //check if nick is empty
     if (nick === null) {
-        displayTopScores();
+        topScoresTable();
     } else {
 
         //check if mode already exists in object
@@ -351,4 +338,27 @@ function displayTopScores() {
     const date = new Date();
     date.setFullYear(date.getFullYear() + 1);
     document.cookie = "topScores=" + JSON.stringify(topScores) + "; expires=" + date.toUTCString();
+
+    displayScores();
+}
+
+//displaying top scores
+function displayScores() {
+    const scoreBoard = document.createElement("div");
+    scoreBoard.setAttribute("style", "width: 300px; height: 500px; overflow: auto; border: solid black 1px; position: absolute; right: 0; top: 0; background-color: lightgray; text-align: center;");
+    const scoreTable = topScores.find(score => score.mode === boardDimensions.x + "x" + boardDimensions.y + "x" + mines.value);
+    if (scoreTable === undefined) {
+        scoreBoard.innerText = `No scores 
+        for mode ${boardDimensions.x}x${boardDimensions.y}x${mines.value}!`;
+    } else {
+        scoreBoard.innerText = `TOP SCORES
+    for mode ${scoreTable.mode}`;
+        scoreTable.scores.forEach(score => {
+            const scoreDiv = document.createElement("div");
+            scoreDiv.innerText = score.nick + " - " + score.time + "s";
+            scoreBoard.append(scoreDiv);
+        })
+    }
+
+    document.body.append(scoreBoard);
 }
