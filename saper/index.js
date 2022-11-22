@@ -5,6 +5,7 @@ let time = 0;
 let remainingMines;
 //score storing structure
 let topScores = [];
+topScores = JSON.parse(document.cookie.split("=")[1])
 
 const GameStatus = {
     INIT: 0,
@@ -113,6 +114,20 @@ function restart() {
     //show invisible information and board, start timer
     remaining.innerText = "Remaining mines: " + remainingMines;
     userUI.style.display = "block";
+
+    const scoreBoard = document.createElement("div");
+    scoreBoard.setAttribute("style", "width: 300px; height: 400px; overflow: auto; border: solid lightgray 1px; position: absolute; right: 0; top: 0; background-color: lightgray; text-align: center;");
+    const scoreTable = topScores.find(score => score.mode === boardDimensions.x + "x" + boardDimensions.y + "x" + mines.value);
+    scoreBoard.innerText = `TOP SCORES
+    for mode ${scoreTable.mode}`;
+    scoreTable.scores.forEach(score => {
+        const scoreDiv = document.createElement("div");
+        scoreDiv.innerText = score.nick + " - " + score.time + "s";
+        scoreBoard.append(scoreDiv);
+    })
+
+    console.log(scoreTable);
+    document.body.append(scoreBoard);
 
     //generate board
     const board = JSON.parse(JSON.stringify(Array(boardDimensions.y).fill() // create array of y elements filled with undefined
