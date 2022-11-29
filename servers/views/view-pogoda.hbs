@@ -1,0 +1,41 @@
+<h2>{{subject}}</h2>
+
+<div>
+
+    <h3>PROGNOZA POGODY W WYBRANYCH MIASTACH</h3>
+
+    <table>
+        <tr style="color: red;">
+            <th>miasto</th>
+            <th>pogoda</th>
+            <th>temperatura</th>
+            <th>smog</th>
+            <th></th>
+            <th>szczegoly</th>
+        </tr>
+        {{#each locations}}
+        <tr style="text-align: center; ">
+            <td>{{name}}</td>
+            <td>
+                <img width="80px" src={{iconUrl}}>
+            </td>
+            <td>
+                <div style="font-size: 20px; background-color: white; padding: 10px; border-radius: 10px">
+                    {{temp}}° <br>
+                    <span style="font-size: 10px;text-transform: uppercase">{{weather}}</span>
+                </div>
+            </td>
+            <td>
+                {{smogTitle}} <br>
+                {{smogDesc}}
+            </td>
+            <td>
+                <img width="40px" src={{smogUrl}}>
+            </td>
+            <td><a href={{forecastUrl}}>zobacz</a></td>
+        </tr>
+        {{/each}}
+
+    </table>
+
+</div>

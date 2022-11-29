@@ -1,0 +1,40 @@
+<h2>{{subject}}</h2>
+
+<h4>Wyswietlenie calej tablicy</h4>
+
+<div>
+    {{langs}} <br>
+    {{digits}}
+</div>
+
+<h4>Pobieranie elementu</h4>
+
+<div>
+    {{langs.[0]}} <br>
+    {{digits.[0].[1]}}
+</div>
+
+<h4>Iteracja</h4>
+<h6>przez tablice</h6>
+
+<div>
+    {{#each countries}}
+    {{@index}} - {{this}} <br>
+    {{/each}}
+</div>
+
+<h6>przez obiekt</h6>
+
+<div>
+    {{#each user}}
+    {{@index}} - {{@key}} - {{this}} <br>
+    {{/each}}
+</div>
+
+<h6>przez tablice obiektow</h6>
+
+<div>
+    {{#each books}}
+    {{@index}} - {{title}} <br>
+    {{/each}}
+</div>
