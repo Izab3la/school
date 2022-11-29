@@ -16,25 +16,31 @@ const Img = {
     SNAKE_TAIL: 'url("images/snake_tail.png")',
     FRUIT: 'url("images/fruit.png")',
 }
-// snake positions
-let snake = [{
-    x: 3,
-    y: 9
-}, {
-    x: 3,
-    y: 10
-}
-];
 // direction
-let direction = 'up';
+let direction;
+let snake
 
 init()
 
 // starter elements
 function init() {
+    direction = 'up'
+    // snake positions
+    snake = [{
+        x: 3,
+        y: 9,
+        direction: 'up'
+    }, {
+        x: 3,
+        y: 10,
+        direction: 'up'
+    }
+    ];
+    // board
+    const container = document.getElementById('container');
+    container.innerHTML = '';
     const game = document.createElement('div');
     game.id = 'game';
-    const container = document.getElementById('container');
     container.append(game);
 
     // mapping board
@@ -49,9 +55,9 @@ function init() {
 
     document.addEventListener('keydown', changeDirection);
 
-    // setInterval(() => {
-    //     moveSnake(board, snake);
-    // }, 300);
+    setInterval(() => {
+        moveSnake(board, snake);
+    }, 300);
 }
 
 // random fruit position
@@ -94,7 +100,6 @@ function changeDirection(e) {
     }
 }
 
-
 // moving snake
 function moveSnake(board, snake) {
 
@@ -102,29 +107,35 @@ function moveSnake(board, snake) {
         case 'up':
             snake.unshift({
                 x: snake[0].x,
-                y: snake[0].y - 1
+                y: snake[0].y - 1,
+                direction: 'up'
             })
             break;
         case 'down':
             snake.unshift({
                 x: snake[0].x,
-                y: snake[0].y + 1
+                y: snake[0].y + 1,
+                direction: 'down'
             })
             break;
         case 'left':
             snake.unshift({
                 x: snake[0].x - 1,
-                y: snake[0].y
+                y: snake[0].y,
+                direction: 'left'
             })
             break;
         case 'right':
             snake.unshift({
                 x: snake[0].x + 1,
-                y: snake[0].y
+                y: snake[0].y,
+                direction: 'right'
             })
             break;
     }
+    // checkHit(board, snake)
     board[snake[0].y][snake[0].x].isThereSnake = true;
+    eatFruit(board, snake);
 
     let removed = snake.pop();
     board[removed.y][removed.x].isThereSnake = false;
@@ -143,30 +154,68 @@ function drawBoard(board, snake) {
             const td = document.createElement('td');
 
             let imgRotation = ''
-            switch (direction) {
-                case 'down':
-                    imgRotation = 'rotate(0deg)';
-                    break;
-                case 'up':
-                    imgRotation = 'rotate(180deg)';
-                    break;
-                case 'left':
-                    imgRotation = 'rotate(90deg)';
-                    break;
-                case 'right':
-                    imgRotation = 'rotate(270deg)';
-                    break;
-            }
+
 
             // change images according to board
             if (field.isThereSnake === true && snake[0].x === row.indexOf(field) && snake[0].y === board.indexOf(row)) {
                 td.style.backgroundImage = Img.SNAKE_HEAD;
+                // check rotation
+                switch (direction) {
+                    case 'down':
+                        imgRotation = 'rotate(0deg)';
+                        break;
+                    case 'up':
+                        imgRotation = 'rotate(180deg)';
+                        break;
+                    case 'left':
+                        imgRotation = 'rotate(90deg)';
+                        break;
+                    case 'right':
+                        imgRotation = 'rotate(270deg)';
+                        break;
+                }
                 td.style.transform = imgRotation;
             } else if (field.isThereSnake === true && snake[snake.length - 1].x === row.indexOf(field) && snake[snake.length - 1].y === board.indexOf(row)) {
                 td.style.backgroundImage = Img.SNAKE_TAIL;
+                // check rotation
+                for (let i = 0; i < snake.length; i++) {
+                    switch (snake[i].direction) {
+                        case 'down':
+                            imgRotation = 'rotate(0deg)';
+                            break;
+                        case 'up':
+                            imgRotation = 'rotate(180deg)';
+                            break;
+                        case 'left':
+                            imgRotation = 'rotate(90deg)';
+                            break;
+                        case 'right':
+                            imgRotation = 'rotate(270deg)';
+                            break;
+                    }
+                }
                 td.style.transform = imgRotation;
             } else if (field.isThereSnake === true) {
                 td.style.backgroundImage = Img.SNAKE_BODY;
+                // check rotation
+                for (let i = 0; i < snake.length; i++) {
+                    switch (snake[i].direction) {
+                        case 'down':
+                            imgRotation = 'rotate(0deg)';
+                            break;
+                        case 'up':
+                            imgRotation = 'rotate(180deg)';
+                            break;
+                        case 'left':
+                            imgRotation = 'rotate(90deg)';
+                            break;
+                        case 'right':
+                            imgRotation = 'rotate(270deg)';
+                            break;
+                    }
+                    console.log(snake);
+
+                }
                 td.style.transform = imgRotation;
             } else if (field.isThereFruit) {
                 td.style.backgroundImage = Img.FRUIT;
@@ -181,4 +230,27 @@ function drawBoard(board, snake) {
     document.querySelector('#game').append(table);
 
 
+}
+
+// eating fruit and growing snake
+function eatFruit(board, snake) {
+    if (board[snake[0].y][snake[0].x].isThereFruit) {
+        board[snake[0].y][snake[0].x].isThereFruit = false;
+        snake.push({
+            x: snake[snake.length - 1].x,
+            y: snake[snake.length - 1].y
+        })
+        getFruit();
+    }
+}
+
+// check snake hitting the wall or itself
+function checkHit(board, snake) {
+    if (snake[0].x < 0 || snake[0].y < 0 || snake[0].x === boardDimensions.width || snake[0].y === boardDimensions.height) {
+        clearInterval()
+        alert('YOU LOST! You hit the wall!');
+    } else if (board[snake[0].y][snake[0].x].isThereSnake === true) {
+        clearInterval()
+        alert('YOU LOST! You hit yourself!');
+    }
 }
