@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: monospace;
+        }
+
+        table,
+        th,
+        td {
+            border: 1px solid white collapse;
+            text-align: center;
+        }
+
+        th {
+            background-color: cornflowerblue;
+            color: white;
+        }
+
+        td {
+            background-color: sandybrown;
+            color: black;
+        }
+
+        th,
+        td {
+            width: 25px;
+            height: 25px;
+        }
+    </style>
+    <script>
+        //punkt 1
+        document.write('<b>Witaj Javascript</b><br>')
+
+        let i = -22;
+        while (i < 22) {
+            document.write(i + '<br>')
+            i++;
+        }
+
+        for (let j = 55; j > -15; j -= 5) {
+            document.write(j + " ")
+        } document.write('<br>')
+
+        for (let k = 40; k >= 10; k--) {
+            if (k <= 15 || k >= 25) {
+                document.write(k + " ")
+            }
+
+        } document.write('<br>')
+
+        //punkt 2
+        let l = -39;
+        while (l < 40) {
+            if (l < 3 || l >= 30) {
+                console.log(l)
+            }
+            l = l + 2;
+        }
+
+
+        let m = -20;
+        while (m < 20) {
+            if (m <= 5 || m >= 10) {
+                console.log(m)
+            }
+            m = m + 2;
+        }
+
+
+        for (let n = -100; n < 41; n++) {
+            if (n % 7 == 0) {
+                if (n <= -28 || n >= 14) {
+                    console.log(n)
+                }
+            }
+        }
+
+        //punkt 3
+        let num = window.prompt("Enter a number:");
+        const x = () => document.write('X')
+        const space = () => document.write('&nbsp;')
+        const nl = () => document.write('<br>')
+
+        //a
+        let s = 0;
+        while (s < num) {
+            x()
+            s++;
+        }
+        nl(); nl()
+
+        //b
+        for (let a = 1; a <= num; a++) {
+            if (a == 1 || a == num) {
+                for (let b = 1; b <= num; b++) {
+                    x()
+                    space()
+                }
+            }
+            else {
+                for (let b = 1; b <= num; b++) {
+                    if (b == 1 || b == num) {
+                        x()
+                        space()
+                    }
+                    else {
+                        space()
+                        space()
+                    }
+                }
+            }
+            nl()
+        }
+        nl()
+
+        //c
+        for (let a = 1; a <= num; a++) {
+            for (let c = 1; c <= (num - a); c++) {
+                space()
+            }
+            if (a > 2 && a < num) {
+                for (let b = 1; b <= num; b++) {
+                    if (b == 1 || b == a) {
+                        x()
+                    }
+                    else {
+                        space()
+                    }
+                }
+            }
+            else {
+                for (let b = 1; b <= a; b++) {
+                    x()
+                }
+            }
+            nl()
+        }
+        nl()
+
+        //d
+        for (let a = 1; a <= num; a++) {
+            for (let b = 1; b <= a; b++) {
+                document.write(b)
+            }
+            nl()
+        }
+        nl()
+
+        //e
+        for (let a = 1; a <= num; a++) {
+            for (let c = 1; c <= (num - a); c++) {
+                space()
+            }
+            for (let b = a; b >= 1; b--) {
+                document.write(b)
+            }
+            nl()
+        }
+        nl()
+
+        //f
+        let silnia = 1;
+        for (let a = 1; a <= num; a++) {
+            silnia *= a;
+        }
+        document.write('Silnia: ' + silnia)
+        nl(); nl()
+
+        //g
+        let sum = 0;
+        for (let a = 0; a <= num; a = a + 2) {
+            sum += a
+        }
+        document.write('Suma parzystych: ' + sum)
+        nl(); nl()
+
+        //h
+        let pierwsza = true
+        for (let a = 2; a < num; a++) {
+            if (num % a == 0) {
+                pierwsza = false
+                break
+            }
+        }
+        if (pierwsza == true) {
+            alert(`Liczba ${num} jest pierwsza`)
+        }
+        else {
+            alert(`Liczba ${num} nie jest pierwsza`)
+        }
+
+        //i
+        document.write('<table id="table">')
+        for (let a = 0; a <= num; a++) {
+            document.write('<tr>')
+
+            if (a == 0) {
+                for (let b = a; b <= num; b++) {
+                    if (b == 0) {
+                        document.write(`<td style="background-color: white"> </td>`)
+                    }
+                    else {
+                        document.write(`<th>${b}</th>`)
+                    }
+                }
+            }
+            else {
+                document.write(`<th>${a}</th>`)
+                for (let b = 1; b <= num; b++) {
+                    if (a * b == a * a) {
+                        document.write(`<td style="background-color: white">${a * b}</td>`)
+                    }
+                    else {
+                        document.write(`<td>${a * b}</td>`)
+                    }
+                }
+            }
+
+            document.write('</tr>')
+        }
+        document.write('</table>')
+        nl()
+
+
+        //punkt 4
+        let reg = prompt('Podaj numer REGON: ');
+        const waga9 = [8, 9, 2, 3, 4, 5, 6, 7];
+        const waga14 = [2, 4, 8, 5, 0, 9, 7, 3, 6, 1, 2, 4, 8];
+        let rodzajNrRegon = true;
+        let check = 0;
+
+        //oblicznie sumy kontrolnej dla danego formatu nr REGON
+        if (reg.length == 9) {
+            for (let a = 0; a < 8; a++) {
+                check += (reg[a] * waga9[a])
+            }
+        }
+        else if (reg.length == 14) {
+            rodzajNrRegon = false;
+            for (let a = 0; a < 14; a++) {
+                check += (reg[a] * waga14[a])
+            }
+        }
+        else {
+            alert('Numer REGON ma niepoprawną długość!')
+        }
+
+        //znalezienie cyfry ktora powinna byc ostatnia
+        let last = check % 11;
+        if (last == 10) {
+            last = 0;
+        }
+
+        //porownanie faktycznej ostatniej cyfry z poprawną cyfra
+        if (last == reg[reg.length - 1]) {
+            alert('Numer REGON poprawny')
+        }
+        else {
+            alert('Numer REGON niepoprawny!')
+        }
+
+    </script>
+</head>
+
+<body>
+
+</body>
+
+</html>

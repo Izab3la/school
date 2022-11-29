@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: monospace;
+        }
+    </style>
+</head>
+
+<body>
+
+
+    <script>
+        let dna = prompt("Enter a DNA sequence: ");
+
+        document.write(dna, "<br>");
+        dna = dna.toUpperCase();
+
+        let DNA = dna.match(/.{1,3}/g);
+        let DNAstat = dna.match(/.{1,3}/g);
+
+        //zmiana stylu konkretnych tripletów
+        let matches = ["TAG", "TAA", "TGA"]
+        DNA.forEach((match, index) => {
+            if (match === "ATG") {
+                DNA[index] = DNA[index].bold().fontcolor("lime");
+            }
+            else if (matches.includes(match))
+                DNA[index] = DNA[index].innerHTML = `<mark>${DNA[index]}</mark>`;
+        })
+
+        DNA = DNA.join(" ");
+        document.write(DNA, "<br><br>");
+
+
+        //tworzenie nici komplementarnej
+        var DNA2 = [];
+        for (let i = 0; i <= DNA.length; i++) {
+            if (DNA[i] === "A") {
+                DNA2[i] = "T";
+            }
+            else if (DNA[i] === "T") {
+                DNA2[i] = "A";
+            }
+            else if (DNA[i] === "C") {
+                DNA2[i] = "G";
+            }
+            else if (DNA[i] === "G") {
+                DNA2[i] = "C";
+            }
+            else {
+                DNA2[i] = " ";
+            }
+        }
+        DNA2 = DNA2.join("");
+        let dna2 = DNA2.toLowerCase();
+        dna2 = dna2.replace(/\s/g, "");
+
+        document.write(DNA2, "<br>")
+        document.write(dna2, "<br>")
+
+        //tworzenie statystyki
+        //tworzenie listy pojawiajacych sie tripletow
+        let stat = [];
+        for (let i = 0; i < DNAstat.length; i++) {
+            if (stat.some(item => DNAstat[i] == item.name)) {
+                let index = stat.findIndex(item => {
+                    return item.name === DNAstat[i];
+                })
+
+                stat[index].quantity++;
+            }
+            else {
+                let item = {
+                    name: DNAstat[i],
+                    quantity: 1
+                }
+                stat.push(item);
+            }
+        }
+
+        //sortowanie
+        stat = stat.sort((el1, el2) => (el1.quantity < el2.quantity) ? 1 : (el1.quantity > el2.quantity) ? -1 : 0);
+
+        for (let i = 0; i < stat.length; i++) {
+            if ((i + 1) % 5 == 0) {
+                document.write(stat[i].name + " - " + stat[i].quantity + "<br>");
+                document.write("</div>");
+            }
+            else if (i % 5 == 0) {
+                let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                if (randomColor == "ffffff" || randomColor == "000000") {
+                    let randomColor = Math.floor(Math.random() * 16777215).toString(16);
+                }
+                document.write(`<div style='background-color: #${randomColor}; width: 70px'>`);
+                document.write(stat[i].name + " - " + stat[i].quantity + "<br>");
+            }
+            else {
+                document.write(stat[i].name + " - " + stat[i].quantity + "<br>");
+            }
+        }
+
+
+    </script>
+</body>
+
+</html>

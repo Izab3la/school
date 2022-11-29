@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zadanie 3</title>
+    <style>
+        textarea::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <img src="https://i.cbc.ca/1.6580033.1663100193!/fileImage/httpImage/image.jpg_gen/derivatives/16x9_780/orion-nebula-jwst.jpg"
+        width="100px">
+
+    <form>
+        <input type="text" value="Ciekawe czy uda Ci się to zrobić        " size="30" style="font-family: monospace;">
+    </form>
+
+    <textarea style="font-family: monospace;" cols="30" rows="10">
+........ szósty punkt ........
+........ piąty punkt .........
+........ czwarty punkt .......
+........ trzeci punkt ........
+........ drugi punkt .........
+........ pierwszy punkt ......
+
+
+
+
+
+
+
+
+
+
+</textarea><br>
+
+
+    <img id="circle" src="https://r-graph-gallery.com/img/graph/295-basic-circular-barplot.png" width="100px"
+        style="position: fixed;">
+
+
+    <script>
+        //punkt 1
+
+        let img = document.querySelector('img');
+        let imgW = img.width;
+        let direction = true;
+
+        setInterval(() => {
+            direction = !direction;
+        }, 2000);
+
+        window.setInterval(() => {
+            if (direction) {
+                imgW += 20;
+                img.width = imgW;
+                console.log(imgW);
+            } else {
+                imgW -= 20;
+                img.width = imgW;
+                console.log(imgW);
+            }
+        }, 200);
+
+
+        //punkt 2
+
+        let input = document.querySelector('input');
+        let display = input.value;
+
+        setInterval(() => {
+            display = display.substr(1) + display[0];
+            input.value = display;
+        }, 200);
+
+
+        //punkt 3
+
+        let textarea = document.querySelector('textarea');
+        let arr = textarea.value.split(/\r?\n/);
+        let fall = [...arr];
+
+        setInterval(() => {
+            textarea.value = fall.join('\r\n');
+            fall.unshift(fall.pop());
+
+            console.log(fall);
+        }, 400);
+
+
+        //punkt 4
+
+        let circle = document.querySelector('#circle');
+        let positionX = circle.style.left;
+        let positionY = circle.style.bottom;
+        let deg = 0;
+
+        setInterval(() => {
+            deg = (deg + Math.PI / 90) % (2 * Math.PI);
+            positionX = 100 + 50 * Math.cos(deg);
+            positionY = 100 + 50 * Math.sin(deg);
+            circle.style.left = positionX + 'px';
+            circle.style.bottom = positionY + 'px';
+        }, 20);
+
+    </script>
+</body>
+
+</html>

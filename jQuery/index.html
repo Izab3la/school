@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+
+    <div id="div"></div>
+    <div id="slider"></div>
+
+    <script src="./jq.js"></script>
+    <script>
+        const data = [
+            {
+                product: 'coat',
+                cat: 'clothes',
+                price: 10.5,
+            },
+            {
+                product: 'pen',
+                cat: 'office',
+                price: 1.5,
+            },
+            {
+                product: 'red hat',
+                cat: 'clothes',
+                price: 8,
+            },
+            {
+                product: 'book',
+                cat: 'office',
+                price: 14.56,
+            },
+        ]
+        const labels = ['Product', 'Price', 'Quantity', 'Sum price']
+
+        $(document).ready(function () {
+            const table = $("<table>")
+            $("#div").append(table)
+            table.css("border", "1px solid black")
+            let final = 0
+            let price
+
+            function priceFormat(price) {
+                priceTab = price.toString().split(".")
+
+                if (priceTab.length === 1) {
+                    priceTab.push("00")
+                } else if (priceTab[1].length === 1) {
+                    priceTab[1] += "0"
+                }
+
+                price = priceTab.join(",") + "$"
+                return price
+            }
+
+            function color(cat) {
+                let cssColor
+                switch (cat) {
+                    case "office":
+                        cssColor = "lightblue"
+                        break;
+                    case "clothes":
+                        cssColor = "pink"
+                        break;
+
+                    default:
+                        cssColor = "white"
+                        break;
+                }
+
+                return cssColor
+            }
+
+            for (let h = 0; h <= data.length + 1; h++) {
+                const tr = $("<tr>")
+                table.append(tr)
+                tr.css("border", "1px solid black")
+                if (h === data.length + 1) {
+                    for (let w = 0; w < 3; w++) {
+                        tr.append("<td>")
+                    }
+                    const td = $("<td>")
+                    tr.append(td)
+                    td
+                        .css("border", "1px solid black")
+                    for (let i = 1; i <= data.length; i++) {
+                        price = ($("#s" + i).text()).replace("$", "")
+                        price = price.replace(",", ".")
+                        price = parseFloat(price)
+                        final += price
+                    }
+                    td.attr("id", "sum")
+                    td.text(priceFormat(final))
+                } else {
+
+                    for (let w = 0; w <= 3; w++) {
+                        if (h === 0) {
+                            const th = $("<th>")
+                            th
+                                .css("border", "1px solid black")
+                                .text(labels[w])
+                            tr.append(th)
+                        } else {
+                            const td = $("<td>")
+                            td
+                                .css("border", "1px solid black")
+                                .css('background-color', color(data[h - 1].cat))
+
+                            if (w === 0) {
+                                td.text(data[h - 1].product)
+                            } else if (w === 1) {
+                                let price = data[h - 1].price
+
+                                td.text(priceFormat(price))
+                            } else if (w === 2) {
+                                td.append("<input type='range' step='1' min='1' max='5' id='r" + h + "'>")
+                            } else {
+                                let sum = (data[h - 1].price) * $("#r" + h).val()
+                                td.text(priceFormat(sum))
+                                td.attr("id", "s" + h)
+                                $("#r" + h).on('mousemove', function () {
+                                    sum = (data[h - 1].price) * $("#r" + h).val()
+                                    td.text(priceFormat(sum))
+
+                                    $("#r" + h).on('mouseup', function () {
+                                        final = 0
+                                        for (let i = 1; i <= data.length; i++) {
+                                            price = ($("#s" + i).text()).replace("$", "")
+                                            price = price.replace(",", ".")
+                                            price = parseFloat(price)
+                                            final += price
+                                        }
+                                        $("#sum").text(final)
+                                    })
+                                })
+                            }
+                            tr.append(td)
+                        }
+                    }
+                }
+            }
+
+            // custom made jquery slider
+            function slideSlide() {
+                const sliderInfo = {
+                    maxWidth: 200,
+                    handle: 100,
+                    countWidth: function () {
+                        return {
+                            left: this.handle,
+                            right: this.maxWidth - this.handle
+                        }
+                    }
+                }
+                const sliderLeft = $("<div>")
+                const handle = $("<div>")
+                const sliderRight = $("<div>")
+                $("#slider")
+                    .append(sliderLeft, handle, sliderRight)
+                    .css({
+                        "align-items": "center",
+                        "margin-top": "20px",
+                        "display": "flex"
+                    })
+                sliderLeft.css({
+                    "background-color": "pink",
+                    "width": "100px",
+                    'height': '10px'
+                });
+                sliderRight.css({
+                    "background-color": "gray",
+                    "width": "100px",
+                    'height': '10px'
+                });
+                handle.css({
+                    "position": "absolute",
+                    "left": sliderInfo.handle + 'px',
+                    "background-color": "pink",
+                    "border-radius": "10px",
+                    "width": "20px",
+                    "height": "20px"
+                });
+                handle.on("mousedown", function () {
+                    $("#slider").on("mousemove", function (e) {
+                        sliderInfo.handle = e.pageX
+                        const { left, right } = sliderInfo.countWidth()
+
+                        if (sliderInfo.handle <= sliderInfo.maxWidth) {
+                            handle.css("left", sliderInfo.handle + "px")
+                            sliderLeft.css("width", left + "px")
+                            sliderRight.css("width", right + "px")
+                            let num = sliderInfo.handle / 40
+                            num = num.toString().split(".")[0]
+                            num = parseInt(num) + 1
+                        }
+
+                        handle.on('mouseup', function () {
+                            $("#slider").off('mousemove')
+                        })
+
+                    })
+                })
+            }
+
+        })
+    </script>
+</body>
+
+</html>

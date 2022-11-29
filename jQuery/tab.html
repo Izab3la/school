@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="container"></div>
+
+    <script src="./jq.js"></script>
+    <script>
+        const data = [
+            {
+                product: 'coat',
+                cat: 'clothes',
+                price: 10.5,
+            },
+            {
+                product: 'pen',
+                cat: 'office',
+                price: 1.5,
+            },
+            {
+                product: 'red hat',
+                cat: 'clothes',
+                price: 8,
+            },
+            {
+                product: 'book',
+                cat: 'office',
+                price: 14.56,
+            },
+        ]
+        const labels = ["Product", "Price", "Quantity", "Sum"]
+
+        $(document).ready(function () {
+            renderTable()
+
+            function renderTable() {
+                let number
+                const table = $("<table>")
+                $("#container").append(table)
+                table.css({
+                    "border": "solid black 1px"
+                })
+                for (let y = 0; y <= data.length; y++) {
+                    const tr = $("<tr>")
+                    tr.css("border", "solid black 1px")
+                    table.append(tr)
+                    for (let x = 0; x < labels.length; x++) {
+                        const td = $("<td>")
+                        if (y === 0) {
+                            const th = $("<th>")
+                            th.text(labels[x])
+                            tr.append(th)
+                        } else {
+                            tr.append(td)
+
+                            const text = () => {
+                                switch (x) {
+                                    case 0:
+                                        return data[y - 1].product;
+                                    case 1:
+                                        return data[y - 1].price;
+                                    case 2:
+                                        getRange(td)
+                                }
+                            }
+
+                            td
+                                .text(text)
+                                .css("border", "solid black 1px")
+                        }
+
+                    }
+                }
+            }
+
+            function getRange(cell) {
+                let num
+                const params = {
+                    maxWidth: 100,
+                    handle: 50,
+                    count: function () {
+                        return {
+                            l: this.handle,
+                            r: this.maxWidth - this.handle
+                        }
+                    }
+                }
+
+                const slider = $("<div>")
+                const left = $("<div>")
+                const right = $("<div>")
+                const handle = $("<div>")
+                cell.append(slider)
+                cell.css({
+                    "padding": "10px"
+                })
+                slider.append(left, right, handle)
+                slider.css({
+                    "display": "flex",
+                    "position": "relative"
+                })
+
+                left.css({
+                    "height": "10px",
+                    "width": "50px",
+                    "background-color": "blue"
+                })
+                right.css({
+                    "height": "10px",
+                    "width": "50px",
+                    "background-color": "lightgray"
+                })
+                handle.css({
+                    "position": "absolute",
+                    "width": "15px",
+                    "height": "15px",
+                    "background-color": "blue",
+                    "left": params.handle,
+                    "top": "-2px"
+                })
+
+                handle.on("mousedown", function () {
+                    slider.on("mousemove", function (e) {
+                        params.handle = e.clientX - slider.offset().left
+                        const { l, r } = params.count()
+
+                        if (params.handle < params.maxWidth && params.handle > 0) {
+                            left.css("width", l)
+                            right.css("width", r)
+                            handle.css("left", params.handle)
+                            num = params.handle / 20
+                            num = Math.ceil(num)
+                        }
+
+
+
+                        slider.on("mouseup", function () {
+                            slider.off("mousemove")
+                        })
+                    })
+                })
+
+            }
+
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="container"></div>
+
+    <script src="./jq.js"></script>
+    <script>
+        $(document).ready(function () {
+            let planets = []
+            init()
+
+            function init() {
+                let bg = $("<div>")
+                bg.css({
+                    "background-color": "blue",
+                    "height": "100vh",
+                    "width": "80vw",
+                    "position": "relative",
+                })
+                $("#container").append(bg)
+
+                let menu = $("<div>")
+                menu.css({
+                    "background-color": "pink",
+                    "height": "100vh",
+                    "width": "20vw",
+                    "position": "absolute",
+                    "right": "0px",
+                    "top": "0px",
+                })
+                $("#container").append(menu)
+
+                const buttons = ["STEPS", "JUMPS", "FLY"]
+                buttons.forEach((button) => {
+                    let btn = $("<button>")
+                    btn.attr("id", button)
+                    btn.text(button)
+                    btn.css({
+                        "background-color": "pink",
+                        "height": "50px",
+                        "width": "90%",
+                        "margin": "10px",
+                    })
+                    menu.append(btn)
+                })
+
+                let rocket = $("<img>")
+                rocket.attr("src", "https://www.freeiconspng.com/thumbs/rocket-ship-png/rocket-ship-png-7.png")
+                rocket.attr("id", "rocket")
+                rocket.css({
+                    "height": "70px",
+                    "width": "50px",
+                    "position": "absolute",
+                })
+                bg.append(rocket)
+
+                addPlanets(bg)
+                moveRocket(bg, rocket)
+            }
+
+            function addPlanets(bg) {
+                $("#container").on("click", function (e) {
+                    let x = e.pageX
+                    let y = e.pageY
+
+                    let div = $("<div>")
+                    let planet = $("<img>")
+                    planet.attr("src", "https://cdn-icons-png.flaticon.com/512/4698/4698689.png")
+                    let planetObj = {
+                        x: x,
+                        y: y,
+                    }
+                    div.css({
+                        "position": "absolute",
+                        "left": x - 40,
+                        "top": y - 40,
+                    })
+                    planet.css({
+                        "height": "60px",
+                    })
+                    planets.push(planetObj)
+                    div.text(planets.length)
+                    div.append(planet)
+                    bg.append(div)
+                })
+            }
+
+            function moveRocket(bg, rocket) {
+                $("#STEPS").on("click", function () {
+                    let x = $("#rocket").css("left").replace("px", "")
+                    let y = $("#rocket").css("top").replace("px", "")
+
+                    let index = planets.findIndex((planet) => {
+                        return planet.x == x && planet.y == y
+                    })
+
+                    if (index === -1) {
+                        $("#rocket").css({
+                            "left": planets[0].x,
+                            "top": planets[0].y,
+                        })
+                    } else {
+                        $("#rocket").css({
+                            "left": planets[index + 1].x,
+                            "top": planets[index + 1].y,
+                        })
+                    }
+                })
+
+                $("#JUMPS").on("click", function () {
+                    $("#rocket").css({
+                        "left": planets[0].x,
+                        "top": planets[0].y,
+                    })
+
+                    setInterval(() => {
+                        let x = $("#rocket").css("left").replace("px", "")
+                        let y = $("#rocket").css("top").replace("px", "")
+
+                        let index = planets.findIndex((planet) => {
+                            return planet.x == x && planet.y == y
+                        })
+
+                        if (index === -1) {
+                            $("#rocket").css({
+                                "left": planets[0].x,
+                                "top": planets[0].y,
+                            })
+                        } else if (index === planets.length - 2) {
+                            clearInterval()
+                        } else {
+                            $("#rocket").css({
+                                "left": planets[index + 1].x,
+                                "top": planets[index + 1].y,
+                            })
+                        }
+                    }, 500)
+                })
+
+                $("#FLY").on("click", function () {
+
+                    function fly() {
+                        let x = $("#rocket").css("left").replace("px", "")
+                        let y = $("#rocket").css("top").replace("px", "")
+
+                        let index = planets.findIndex((planet) => {
+                            return planet.x == x && planet.y == y
+                        })
+
+                        if (index === -1) {
+                            $("#rocket").css({
+                                "left": planets[0].x,
+                                "top": planets[0].y,
+                            })
+                        } else if (index === planets.length - 2) {
+                            cancelAnimationFrame(fly)
+                        } else {
+                            $("#rocket").css({
+                                "left": planets[index + 1].x,
+                                "top": planets[index + 1].y,
+                            })
+                        }
+                        requestAnimationFrame(fly)
+                    }
+
+                    fly()
+                })
+            }
+
+        })
+    </script>
+</body>
+
+</html>
