@@ -1,0 +1,33 @@
+{{> head}}
+<section>
+    filemanager <br>
+    <a href="/reset">USUN DANE O PLIKACH Z TABLICY</a>
+</section>
+<main>
+    <table>
+        <tr>
+            <th>id</th>
+            <th>obraz</th>
+            <th>name</th>
+            <th>size</th>
+            <th>type</th>
+            <th>-</th>
+            <th>-</th>
+            <th>-</th>
+            <th>-</th>
+        </tr>
+        {{#each item}}
+        <tr>
+            <td>{{id}}</td>
+            <td><img src="/gfx/{{file type}}.png" alt="{{type}}" width="50"></td>
+            <td>{{name}}</td>
+            <td>{{size}}</td>
+            <td>{{type}}</td>
+            <td><a href="/show/?id={{id}}">SHOW</a></td>
+            <td><a href="/info/?id={{id}}">INFO</a></td>
+            <td><a href="/download/{{id}}">DOWNLOAD</a></td>
+            <td><a href="/delete/{{id}}">DELETE</a></td>
+        </tr>
+        {{/each}}
+    </table>
+</main>

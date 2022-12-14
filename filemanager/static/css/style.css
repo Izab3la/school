@@ -1,0 +1,49 @@
+header {
+    background-color: blue;
+    color: white;
+    padding: 10px;
+}
+
+.h {
+    color: white;
+}
+
+a {
+    color: black;
+}
+
+td {
+    width: 150px;
+}
+
+th {
+    background-color: lightblue;
+}
+
+table {
+    text-align: center;
+}
+
+section {
+    background-color: lightgray;
+    color: gray;
+    padding: 10px;
+    width: 20%;
+    height: 100vh;
+    float: left;
+    text-align: center;
+}
+
+.blue {
+    color: blue;
+    font-weight: bold;
+}
+
+.info {
+    color: gray;
+    font-weight: bold;
+}
+
+form {
+    margin: 20px;
+}
