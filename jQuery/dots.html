@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .dot {
+            background-color: red;
+        }
+
+        .empty {
+            background-color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="container"></div>
+
+    <script src="./jq.js"></script>
+    <script>
+        $(document).ready(function () {
+            let size = 40
+            let howMany = 10
+
+            makeDot($("#container"), howMany)
+
+
+            $("#container").on("click", function (e) {
+                const target = e.target
+                howMany = 2
+                size = $(target).width() / 2
+
+                console.log(size, this);
+
+                $(target).addClass("empty")
+                makeDot(target, howMany)
+
+            })
+
+
+            function makeDot(where, howMany) {
+                const div = $("<div>")
+                for (let y = 0; y < howMany; y++) {
+                    for (let x = 0; x < howMany; x++) {
+                        const dot = $("<div>")
+                        dot.addClass("dot")
+                        dot.css({
+                            "position": "absolute",
+                            "border-radius": "20px",
+                            "width": size + "px",
+                            "height": size + "px",
+                            "left": size * x,
+                            "top": size * y,
+                        })
+                        div.append(dot)
+                        div.appendTo(where)
+                    }
+                }
+            }
+        })
+    </script>
+</body>
+
+</html>
