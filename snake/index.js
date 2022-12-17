@@ -19,6 +19,9 @@ const Img = {
 // direction
 let direction;
 let snake
+const move = null
+
+let gameEnded = false
 
 init()
 
@@ -55,8 +58,10 @@ function init() {
 
     document.addEventListener('keydown', changeDirection);
 
-    setInterval(() => {
-        moveSnake(board, snake);
+    move = setInterval(() => {
+        if (!gameEnded) {
+            moveSnake(board, snake);
+        }
     }, 300);
 }
 
@@ -134,6 +139,8 @@ function moveSnake(board, snake) {
             break;
     }
     // checkHit(board, snake)
+    checkHit(board, snake);
+
     board[snake[0].y][snake[0].x].isThereSnake = true;
     eatFruit(board, snake);
 
@@ -143,21 +150,91 @@ function moveSnake(board, snake) {
     drawBoard(board, snake);
 }
 
+// change direction of snake body
+function changeFieldDirection(board, snake) {
+    if (snake.length > 1) {
+        const last = snake[snake.length - 1]
+        const nextToLast = snake[snake.length - 2]
+
+        if (last.y < nextToLast.y) {
+            last.direction = 'down'
+        }
+        else if (last.y > nextToLast.y) {
+            last.direction = 'up'
+        }
+        else if (last.x < nextToLast.x) {
+            last.direction = 'right'
+        }
+        else if (last.x > nextToLast.x) {
+            last.direction = 'left'
+        }
+
+        for (let i = 1; i < snake.length - 1; i++) {
+            const next = snake[i + 1]
+            const curr = snake[i]
+            const prev = snake[i - 1]
+
+            if (next.y < curr.y) {
+                if (curr.x === prev.x) {
+                    curr.direction = 'down'
+                }
+                else if (curr.x < prev.x) {
+                    curr.direction = 'down left'
+                }
+                else if (curr.x > prev.x) {
+                    curr.direction = 'down right'
+                }
+            } else if (next.y > curr.y) {
+                if (curr.x === prev.x) {
+                    curr.direction = 'up'
+                }
+                else if (curr.x < prev.x) {
+                    curr.direction = 'up left'
+                }
+                else if (curr.x > prev.x) {
+                    curr.direction = 'up right'
+                }
+            } else if (next.x < curr.x) {
+                if (curr.y === prev.y) {
+                    curr.direction = 'right'
+                }
+                else if (curr.y < prev.y) {
+                    curr.direction = 'right up'
+                }
+                else if (curr.y > prev.y) {
+                    curr.direction = 'right down'
+                }
+            } else if (next.x > curr.x) {
+                if (curr.y === prev.y) {
+                    curr.direction = 'left'
+                }
+                else if (curr.y < prev.y) {
+                    curr.direction = 'left up'
+                }
+                else if (curr.y > prev.y) {
+                    curr.direction = 'left down'
+                }
+            }
+        }
+    }
+
+}
+
 // drawing board
 function drawBoard(board, snake) {
     document.querySelector('#game').innerHTML = '';
     // create html board
     const table = document.createElement('table');
-    board.forEach(row => {
+    board.forEach((row, i) => {
         const tr = document.createElement('tr');
-        row.forEach(field => {
+        row.forEach((field, j) => {
             const td = document.createElement('td');
 
             let imgRotation = ''
-
+            changeFieldDirection(board, snake)
 
             // change images according to board
-            if (field.isThereSnake === true && snake[0].x === row.indexOf(field) && snake[0].y === board.indexOf(row)) {
+            if (field.isThereSnake === true && snake[0].x === j && snake[0].y === i) {
                 td.style.backgroundImage = Img.SNAKE_HEAD;
                 // check rotation
                 switch (direction) {
@@ -175,46 +252,69 @@ function drawBoard(board, snake) {
                         break;
                 }
                 td.style.transform = imgRotation;
-            } else if (field.isThereSnake === true && snake[snake.length - 1].x === row.indexOf(field) && snake[snake.length - 1].y === board.indexOf(row)) {
+            } else if (field.isThereSnake === true && snake[snake.length - 1].x === j && snake[snake.length - 1].y === i) {
                 td.style.backgroundImage = Img.SNAKE_TAIL;
                 // check rotation
-                for (let i = 0; i < snake.length; i++) {
-                    switch (snake[i].direction) {
-                        case 'down':
-                            imgRotation = 'rotate(0deg)';
-                            break;
-                        case 'up':
-                            imgRotation = 'rotate(180deg)';
-                            break;
-                        case 'left':
-                            imgRotation = 'rotate(90deg)';
-                            break;
-                        case 'right':
-                            imgRotation = 'rotate(270deg)';
-                            break;
-                    }
+                switch (snake[snake.length - 1].direction) {
+                    case 'down':
+                        imgRotation = 'rotate(0deg)';
+                        break;
+                    case 'up':
+                        imgRotation = 'rotate(180deg)';
+                        break;
+                    case 'left':
+                        imgRotation = 'rotate(90deg)';
+                        break;
+                    case 'right':
+                        imgRotation = 'rotate(270deg)';
+                        break;
                 }
                 td.style.transform = imgRotation;
             } else if (field.isThereSnake === true) {
-                td.style.backgroundImage = Img.SNAKE_BODY;
+                td.style.backgroundImage = Img.SNAKE_CURVE;
                 // check rotation
-                for (let i = 0; i < snake.length; i++) {
-                    switch (snake[i].direction) {
-                        case 'down':
-                            imgRotation = 'rotate(0deg)';
-                            break;
-                        case 'up':
-                            imgRotation = 'rotate(180deg)';
-                            break;
-                        case 'left':
-                            imgRotation = 'rotate(90deg)';
-                            break;
-                        case 'right':
-                            imgRotation = 'rotate(270deg)';
-                            break;
-                    }
-                    console.log(snake);
-
+                const current = snake.find(el => el.x === j && el.y === i)
+                switch (current.direction) {
+                    case 'down':
+                        td.style.backgroundImage = Img.SNAKE_BODY;
+                        imgRotation = 'rotate(0deg)';
+                        break;
+                    case 'down right':
+                        imgRotation = 'rotate(270deg)'
+                        break;
+                    case 'down left':
+                        imgRotation = 'rotate(0deg)';
+                        break;
+                    case 'up':
+                        td.style.backgroundImage = Img.SNAKE_BODY;
+                        imgRotation = 'rotate(180deg)';
+                        break;
+                    case 'up left':
+                        imgRotation = 'rotate(90deg)';
+                        break;
+                    case 'up right':
+                        imgRotation = 'rotate(180deg)';
+                        break;
+                    case 'left':
+                        td.style.backgroundImage = Img.SNAKE_BODY;
+                        imgRotation = 'rotate(90deg)';
+                        break;
+                    case 'left down':
+                        imgRotation = 'rotate(0deg)';
+                        break;
+                    case 'left up':
+                        imgRotation = 'rotate(90deg)';
+                        break;
+                    case 'right':
+                        td.style.backgroundImage = Img.SNAKE_BODY;
+                        imgRotation = 'rotate(270deg)';
+                        break;
+                    case 'right up':
+                        imgRotation = 'rotate(180deg)';
+                        break;
+                    case 'right down':
+                        imgRotation = 'rotate(270deg)';
+                        break;
                 }
                 td.style.transform = imgRotation;
             } else if (field.isThereFruit) {
@@ -222,13 +322,11 @@ function drawBoard(board, snake) {
             } else {
                 td.style.backgroundImage = 'none';
             }
-
             tr.append(td);
         })
         table.append(tr);
     })
     document.querySelector('#game').append(table);
-
 
 }
 
@@ -247,10 +345,16 @@ function eatFruit(board, snake) {
 // check snake hitting the wall or itself
 function checkHit(board, snake) {
     if (snake[0].x < 0 || snake[0].y < 0 || snake[0].x === boardDimensions.width || snake[0].y === boardDimensions.height) {
-        clearInterval()
-        alert('YOU LOST! You hit the wall!');
+        gameEnded = true;
+        clearInterval(move)
+        setTimeout(() => {
+            alert('YOU LOST! You hit the wall!');
+        }, 400)
     } else if (board[snake[0].y][snake[0].x].isThereSnake === true) {
-        clearInterval()
-        alert('YOU LOST! You hit yourself!');
+        gameEnded = true;
+        clearInterval(move)
+        setTimeout(() => {
+            alert('YOU LOST! You hit yourself!');
+        }, 400)
     }
 }
